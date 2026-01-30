@@ -1,5 +1,7 @@
 const std = @import("std");
 const uart = @import("uart.zig");
+const trap = @import("trap.zig");
+const KernelCtx = @import("KernelCtx.zig");
 
 pub const panic = std.debug.FullPanic(panicHandler);
 fn panicHandler(msg: []const u8, return_addr: ?usize) noreturn {
@@ -11,8 +13,10 @@ fn panicHandler(msg: []const u8, return_addr: ?usize) noreturn {
 
 
 export fn kmain() noreturn {
-    _ = uart.writer.print("Hello, World!", .{}) catch {};
-    uart.writer.flush() catch {};
+    uart.init();
+    KernelCtx.init();
+    trap.init();
 
+    asm volatile ("ecall");
     while (true) {}
 }
