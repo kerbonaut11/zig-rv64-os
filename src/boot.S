@@ -11,6 +11,9 @@ _start:
 .option norelax
 	la gp, global_pointer
 .option pop
+
+  csrr t0, mhartid
+  bnez t0, wait
 	
 	/* Reset satp */
 	csrw satp, zero
@@ -31,6 +34,9 @@ bss_clear:
 	
 	/* Jump to kernel! */
 	tail kmain
+
+wait:
+  j wait
 	
 	.cfi_endproc
 
