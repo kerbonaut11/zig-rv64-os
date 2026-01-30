@@ -1,0 +1,7 @@
+.{
+    .name = .zig_rv64_os,
+    .version = "0.0.1",
+    .minimum_zig_version = "0.15.2",
+    .paths = .{""},
+    .fingerprint = 0x55d1aa4ba776dde5,
+}
