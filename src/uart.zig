@@ -63,12 +63,13 @@ pub fn init() void {
 
 
 pub const writer: *Writer = &writer_inst;
-var writer_buf: [32]u8 = undefined;
+var writer_buf: [64]u8 = undefined;
 var writer_inst = std.io.Writer{
     .buffer = &writer_buf,
     .end = 0,
     .vtable = &.{
         .drain = &drain,
+        .flush = &flush,
     },
 };
 
@@ -92,6 +93,12 @@ fn drain(w: *Writer, data: []const []const u8, splat: usize) Writer.Error!usize 
 
     return bytes_written;
 }
+
+fn flush(w: *Writer) Writer.Error!void {
+    for (w.buffer[0..w.end]) |byte| writeCh(byte);
+    w.end = 0;
+}
+
 
 fn writeCh(ch: u8) void {
     while (!line_status.thr_empty) {}
