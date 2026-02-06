@@ -1,6 +1,5 @@
 const std = @import("std");
 const csr = @import("csr.zig");
-const uart = @import("uart.zig");
 
 pub const Entry = packed struct(u64) {
     valid: bool = true,

@@ -22,8 +22,7 @@ fn logFn(
 pub const panic = std.debug.FullPanic(panicHandler);
 fn panicHandler(msg: []const u8, return_addr: ?usize) noreturn {
     _ = return_addr;
-    uart.writer.print("\npanic: {s}", .{msg}) catch {};
-    uart.writer.flush() catch {};
+    std.log.err("{s}\n", .{msg});
     while (true) {}
 }
 
@@ -35,6 +34,6 @@ export fn kmain() noreturn {
     page.init();
 
     asm volatile ("ecall");
-    asm volatile ("ecall");
-    while (true) {}
+
+    @panic("end");
 }
