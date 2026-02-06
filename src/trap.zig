@@ -4,6 +4,37 @@ const csr = @import("csr.zig");
 const KernelCtx = @import("KernelCtx.zig");
 const log = std.log.scoped(.trap);
 
+pub const Cause = enum(u64) {
+    pub const interrupt_bit = 1 << 63;
+
+    s_software_interrupt       = interrupt_bit|1,
+    m_software_interrupt       = interrupt_bit|3,
+    s_timer_interrupt          = interrupt_bit|5,
+    m_timer_interrupt          = interrupt_bit|7,
+    s_external_interrupt       = interrupt_bit|9,
+    m_external_interrupt       = interrupt_bit|11,
+    counter_overflow_interrupt = interrupt_bit|13,
+
+    instruction_addres_misalinged = 0,
+    instruction_acces_fault,
+    illegal_instruction,
+    breakpoint,
+    load_addres_misaligned,
+    load_acces_fault,
+    store_addres_misaligned,
+    store_acces_fault,
+    ecall_from_u_mode,
+    ecall_from_s_mode,
+    ecall_from_m_mode = 11,
+    instruction_page_fault,
+    load_page_fault,
+    store_page_fault = 15,
+    double_trap,
+    software_check = 18,
+    hardware_error,
+    _,
+};
+
 pub fn init() void {
     csr.write("mtvec", @intFromPtr(&trap));
     csr.write("medeleg", 0);
@@ -14,7 +45,7 @@ pub fn init() void {
 pub const Frame = extern struct {
     xregs: [32]u64,
     epc: u64,
-    cause: u64,
+    cause: Cause,
     tval: u64,
 };
 
@@ -57,7 +88,7 @@ pub export fn trap() align(4) callconv(.naked) void {
 export fn trapInner() void {
     const frame: *Frame = &KernelCtx.get().trap_frame;
     frame.epc = csr.read("mepc");
-    frame.cause = csr.read("mcause");
+    frame.cause = @enumFromInt(csr.read("mcause"));
     frame.tval = csr.read("mtval");
 
     log.debug("epc   {x}", .{frame.epc});
