@@ -4,6 +4,7 @@ pub fn build(b: *std.Build) void {
     const target = b.resolveTargetQuery(.{
         .cpu_arch = .riscv64,
         .os_tag = .freestanding,
+        .cpu_features_sub = std.Target.riscv.featureSet(&.{.c}),
     });
 
     const kernel = b.addExecutable(.{
@@ -22,8 +23,12 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(kernel);
 
-    const run_command = b.addSystemCommand(&.{"qemu-system-riscv64", "-machine", "virt", "-bios", "none", "-serial", "mon:stdio", "-kernel"});
+    const debug = b.option(bool, "qemu-gdb", "") != null;
+
+    const run_command = b.addSystemCommand(&.{"qemu-system-riscv64", "-machine", "virt", "-bios", "none", "-nographic", });
+    run_command.addArg("-kernel");
     run_command.addFileArg(kernel.getEmittedBin());
+    if (debug) run_command.addArgs(&.{"-s", "-S"});
     const run_step = b.step("run", "run the os with qemu");
     run_step.dependOn(&run_command.step);
 }

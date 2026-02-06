@@ -12,13 +12,9 @@ var instance: Ctx = undefined;
 pub fn init() void {
     instance.trap_frame = std.mem.zeroes(trap.Frame);
     instance.gp = asm ("mv %[ret], gp" : [ret] "=r" (-> u64));
-    csr.write("mscratch", @intFromPtr(&instance));
-
-    //uart.writer.print("{p}\n", .{&get().gp}) catch {};
-    //uart.writer.print("{x}\n", .{@offsetOf(Ctx, "trap_frame")+csr.read("mscratch")}) catch {};
-    //uart.writer.flush() catch {};
+    csr.write("sscratch", @intFromPtr(&instance));
 }
 
 pub fn get() *Ctx {
-    return @ptrFromInt(csr.read("mscratch"));
+    return @ptrFromInt(csr.read("sscratch"));
 }
