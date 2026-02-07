@@ -63,13 +63,12 @@ pub fn init() void {
 
 
 pub const writer: *Writer = &writer_inst;
-var writer_buf: [64]u8 = undefined;
+var writer_buf: [0]u8 = undefined;
 var writer_inst = std.io.Writer{
     .buffer = &writer_buf,
     .end = 0,
     .vtable = &.{
         .drain = &drain,
-        .flush = &flush,
     },
 };
 

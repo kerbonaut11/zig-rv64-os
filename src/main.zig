@@ -3,7 +3,9 @@ const uart = @import("uart.zig");
 const trap = @import("trap.zig");
 const page = @import("page.zig");
 const KernelCtx = @import("KernelCtx.zig");
+const hardware_info = @import("hardware_info.zig");
 pub const std_options: std.Options = .{
+    .log_level = .debug,
     .logFn = logFn,
 };
 
@@ -22,18 +24,19 @@ fn logFn(
 pub const panic = std.debug.FullPanic(panicHandler);
 fn panicHandler(msg: []const u8, return_addr: ?usize) noreturn {
     _ = return_addr;
-    std.log.err("{s}\n", .{msg});
+    uart.writer.print("panic: {s}\n", .{msg}) catch {};
+    uart.writer.flush() catch {};
     while (true) {}
 }
 
 
-export fn kmain() noreturn {
+export fn kmain(_: u64, flattened_device_tree: *anyopaque) noreturn {
     uart.init();
     KernelCtx.init();
     trap.init();
     page.init();
+    hardware_info.init(flattened_device_tree);
 
-    asm volatile ("ecall");
 
     @panic("end");
 }

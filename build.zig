@@ -25,7 +25,7 @@ pub fn build(b: *std.Build) void {
 
     const debug = b.option(bool, "qemu-gdb", "") != null;
 
-    const run_command = b.addSystemCommand(&.{"qemu-system-riscv64", "-machine", "virt", "-bios", "none", "-nographic", });
+    const run_command = b.addSystemCommand(&.{"qemu-system-riscv64", "-machine", "virt", "-bios", "none", "-nographic",});
     run_command.addArg("-kernel");
     run_command.addFileArg(kernel.getEmittedBin());
     if (debug) run_command.addArgs(&.{"-s", "-S"});

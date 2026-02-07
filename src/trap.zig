@@ -93,7 +93,7 @@ export fn trapInner() void {
 
     log.debug("epc   {x}", .{frame.epc});
     log.debug("cause {}",  .{frame.cause});
-    log.debug("tval  {}",  .{frame.tval});
+    log.debug("tval  {x}",  .{frame.tval});
 
     csr.write("mepc",    frame.epc+4);
     csr.write("mstatus", (1 << 11));

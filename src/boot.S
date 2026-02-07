@@ -20,6 +20,7 @@ _start:
 	
 	/* Setup stack */
 	la sp, stack_top
+  mv tp, a0
 	
 	/* Clear the BSS section */
 	la t5, bss_start
